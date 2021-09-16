@@ -47,13 +47,13 @@ import fr.utbm.info.da53.lw1.token.StringLiteralToken;
 import fr.utbm.info.da53.lw1.token.ThenToken;
 import fr.utbm.info.da53.lw1.token.Token;
 
-/** This is the lexical analyzer.
+/** This is the lexical analyzer. This lexer reads character-per-character the input file
+ * (through the Scanner) and detect the correct token with "switch".
  * 
- * @author Jonathan DEMANGE &lt;jonathan.demange@utbm.fr&gt;
  * @author St&eacute;phane GALLAND &lt;stephane.galland@utbm.fr&gt;
  * @version $Name$ $Revision$ $Date$
  */
-public class Lexer {
+public class CharacterPerCharacterLexer {
 	
 	private final Scanner peeker;
 	private final SymbolTable symbolTable;
@@ -72,7 +72,7 @@ public class Lexer {
 	 * @param symbolTable
 	 * @throws IOException
 	 */
-	public Lexer(Reader stream, SymbolTable symbolTable) throws IOException {
+	public CharacterPerCharacterLexer(Reader stream, SymbolTable symbolTable) throws IOException {
 		assert(stream!=null);
 		assert(symbolTable!=null);
 		

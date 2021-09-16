@@ -26,7 +26,33 @@ package fr.utbm.info.da53.lw1.token;
  * @version $Name$ $Revision$ $Date$
  */
 public class ArithmeticOperatorToken extends Token {
-	
+
+	/** Factory method for this token.
+	 *
+	 * @param lexeme the lexeme.
+	 * @param tokenType the token type, usually this type.
+	 */
+	public static ArithmeticOperatorToken create(String lexeme, Class<? extends Token> tokenType) {
+		ArithmeticOperatorType type;
+		switch (lexeme) {
+		case "+":
+			type = ArithmeticOperatorType.PLUS;
+			break;
+		case "-":
+			type = ArithmeticOperatorType.MINUS;
+			break;
+		case "/":
+			type = ArithmeticOperatorType.DIVIDE;
+			break;
+		case "*":
+			type = ArithmeticOperatorType.MULTIPLY;
+			break;
+		default:
+			throw new RuntimeException("unsupported arithmetic operator: " + lexeme);
+		}
+		return new ArithmeticOperatorToken(lexeme.charAt(0), type);
+	}
+
 	/**
 	 * This is the enumeration of all the supported arithmetic operators.
 	 * 
@@ -50,7 +76,7 @@ public class ArithmeticOperatorToken extends Token {
 	}
 	
 	private final ArithmeticOperatorType type;
-	
+
 	/**
 	 * @param lexeme is the lexeme associated to this token.
 	 * @param type is the type of the operator.

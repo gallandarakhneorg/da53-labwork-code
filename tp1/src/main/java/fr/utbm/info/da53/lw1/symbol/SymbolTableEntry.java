@@ -44,8 +44,8 @@ public class SymbolTableEntry {
 	 */
 	SymbolTableEntry(Token token, int line, int column) {
 		assert(token!=null);
-		assert(line>=1);
-		assert(column>=1);
+		assert(line >= 1 || line == -1);
+		assert(column >= 1 || column == -1);
 		this.isReservedWord = false;
 		this.token = token;
 		this.firstOccurrenceLine = line;

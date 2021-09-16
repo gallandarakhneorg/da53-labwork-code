@@ -24,7 +24,7 @@ import java.util.prefs.Preferences;
 
 import javax.swing.JFileChooser;
 
-import fr.utbm.info.da53.lw1.lexer.Lexer;
+import fr.utbm.info.da53.lw1.lexer.RegexLexer;
 import fr.utbm.info.da53.lw1.symbol.SymbolTable;
 import fr.utbm.info.da53.lw1.token.Token;
 
@@ -63,7 +63,9 @@ public class TinyBasicCompiler {
 			
 			// Parse the file
 			SymbolTable symbolTable = new SymbolTable();
-			Lexer lexer = new Lexer(new FileReader(inputFile), symbolTable);
+			
+			//CharacterPerCharacterLexer lexer = new CharacterPerCharacterLexer(new FileReader(inputFile), symbolTable);
+			RegexLexer lexer = new RegexLexer(new FileReader(inputFile), symbolTable);
 			
 			Token token = lexer.getNextSymbol();
 			int previousLine = 1;

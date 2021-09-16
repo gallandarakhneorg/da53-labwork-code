@@ -27,6 +27,39 @@ package fr.utbm.info.da53.lw1.token;
  */
 public class RelationalOperatorToken extends Token {
 	
+	/** Factory method for this token.
+	 *
+	 * @param lexeme the lexeme.
+	 * @param tokenType the token type, usually this type.
+	 */
+	public static RelationalOperatorToken create(String lexeme, Class<? extends Token> tokenType) {
+		RelationalOperatorType type;
+		switch (lexeme) {
+		case "<=":
+			type = RelationalOperatorType.LE;
+			break;
+		case ">=":
+			type = RelationalOperatorType.GE;
+			break;
+		case "<>":
+		case "><":
+			type = RelationalOperatorType.NE;
+			break;
+		case "<":
+			type = RelationalOperatorType.LT;
+			break;
+		case ">":
+			type = RelationalOperatorType.GT;
+			break;
+		case "=":
+			type = RelationalOperatorType.EQ;
+			break;
+		default:
+			throw new RuntimeException("unsupported relational operator: " + lexeme);
+		}
+		return new RelationalOperatorToken(lexeme, type);
+	}
+
 	/**
 	 * This is the enumeration of all the supported comparison operators.
 	 * 

@@ -26,6 +26,15 @@ package fr.utbm.info.da53.lw1.token;
  */
 public class PrintToken extends ReservedWordToken {
 	
+	/** Factory method for this token.
+	 *
+	 * @param lexeme the lexeme.
+	 * @param tokenType the token type, usually this type.
+	 */
+	public static PrintToken create(String lexeme, Class<? extends Token> tokenType) {
+		return new PrintToken();
+	}
+
 	/** Lexeme for this keyword.
 	 */
 	public static final String LEXEME = "print"; //$NON-NLS-1$

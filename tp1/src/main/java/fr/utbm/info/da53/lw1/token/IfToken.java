@@ -26,6 +26,15 @@ package fr.utbm.info.da53.lw1.token;
  */
 public class IfToken extends ReservedWordToken {
 	
+	/** Factory method for this token.
+	 *
+	 * @param lexeme the lexeme.
+	 * @param tokenType the token type, usually this type.
+	 */
+	public static IfToken create(String lexeme, Class<? extends Token> tokenType) {
+		return new IfToken();
+	}
+
 	/** Lexeme for this keyword.
 	 */
 	public static final String LEXEME = "if"; //$NON-NLS-1$

@@ -27,6 +27,15 @@ package fr.utbm.info.da53.lw1.token;
  */
 public class CloseParenthesisToken extends Token {
 	
+	/** Factory method for this token.
+	 *
+	 * @param lexeme the lexeme.
+	 * @param tokenType the token type, usually this type.
+	 */
+	public static CloseParenthesisToken create(String lexeme, Class<? extends Token> tokenType) {
+		return new CloseParenthesisToken(lexeme.charAt(0));
+	}
+
 	/**
 	 * @param lexeme
 	 */

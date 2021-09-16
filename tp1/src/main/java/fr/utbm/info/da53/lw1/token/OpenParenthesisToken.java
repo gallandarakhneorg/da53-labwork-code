@@ -26,7 +26,16 @@ package fr.utbm.info.da53.lw1.token;
  * @version $Name$ $Revision$ $Date$
  */
 public class OpenParenthesisToken extends Token {
-	
+
+	/** Factory method for this token.
+	 *
+	 * @param lexeme the lexeme.
+	 * @param tokenType the token type, usually this type.
+	 */
+	public static OpenParenthesisToken create(String lexeme, Class<? extends Token> tokenType) {
+		return new OpenParenthesisToken(lexeme.charAt(0));
+	}
+
 	/**
 	 * @param lexeme
 	 */

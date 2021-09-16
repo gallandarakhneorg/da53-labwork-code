@@ -26,6 +26,15 @@ package fr.utbm.info.da53.lw1.token;
  */
 public class ThenToken extends ReservedWordToken {
 	
+	/** Factory method for this token.
+	 *
+	 * @param lexeme the lexeme.
+	 * @param tokenType the token type, usually this type.
+	 */
+	public static ThenToken create(String lexeme, Class<? extends Token> tokenType) {
+		return new ThenToken();
+	}
+
 	/** Lexeme for this keyword.
 	 */
 	public static final String LEXEME = "then"; //$NON-NLS-1$
