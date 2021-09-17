@@ -1,0 +1,628 @@
+/* 
+ * $Id$
+ * 
+ * Copyright (c) 2012-2021 Stephane GALLAND.
+ * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+options {
+  IGNORE_CASE = true;
+  STATIC = false;
+}
+
+PARSER_BEGIN(BasicParser)
+
+package fr.utbm.info.da53.lw4.parser;
+
+import java.util.SortedMap;
+import java.util.Map;
+import java.util.List;
+import java.util.TreeMap;
+import java.util.ArrayList;
+
+import fr.utbm.info.da53.lw4.type.*;
+import fr.utbm.info.da53.lw4.construct.*;
+import fr.utbm.info.da53.lw4.symbol.*;
+import fr.utbm.info.da53.lw4.error.*;
+import fr.utbm.info.da53.lw4.syntaxtree.*;
+
+public class BasicParser {
+
+	private int basicLineNumber = 1;
+	private final SymbolTable symbolTable = new SymbolTable();
+
+	/** Replies the symbol table used by the parser.
+	 * @return the symbol table.
+	 */
+	public SymbolTable getSymbolTable() {
+		return this.symbolTable;
+	}
+	
+	/** Run the lexer and the syntax analyzer.
+	 * @return the syntax tree.
+	 * @throw CompilerException
+	 */
+	public SortedMap<Integer,Statement> executeCompiler() throws CompilerException {
+		try {
+			SortedMap<Integer,Statement> code = new TreeMap<Integer,Statement>();
+			this.symbolTable.clear();
+			statements(code);
+			return code;
+		}
+		catch(ParseException e) {
+			if (e.currentToken!=null) {
+				throw new CompilerException(CompilationErrorType.SYNTAX_ERROR,
+							e.currentToken.endLine, e);
+			}
+			else if (this.token!=null) {
+				throw new CompilerException(CompilationErrorType.SYNTAX_ERROR,
+							this.token.endLine,  e);
+			}
+			throw new CompilerException(CompilationErrorType.SYNTAX_ERROR, e);
+		}
+		catch(TokenMgrError e) {
+			if (this.token!=null) {
+				throw new CompilerException(CompilationErrorType.ILLEGAL_CHARACTER,
+							this.token.endLine,  e);
+			}
+			throw new CompilerException(CompilationErrorType.INTERNAL_LEXER_ERROR, e);
+		}
+		catch(Throwable e) {
+			throw new CompilerException(CompilationErrorType.INTERNAL_ERROR, e);
+		}
+	}
+
+}
+
+PARSER_END(BasicParser)
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Lexical structure
+////////////////////////////////////////////////////////////////////////////////
+
+SKIP :
+{
+	   " "
+	|  "\t"
+	|  "\r"
+	|  <"REM" ((" "|"\t")(~["\n","\r"])*)? ("\n" | "\r" | "\r\n")>
+}
+
+TOKEN :
+{
+	< CR: "\n" >
+}
+
+////////////////////////////////
+// PUNCTUATION.
+
+// Punctuation symbols are hard-coded into the grammar, below.
+
+////////////////////////////////
+// ARITHMETIC OPERATORS.
+
+// Arithmetic operators are hard-coded into the grammar, below.
+
+////////////////////////////////
+// COMPARISON OPERATORS.
+
+// Comparison operators are hard-coded into the grammar, below; except for diff.
+TOKEN :
+{
+	  < DIFF: ("<>") | ("><") >
+	| < GE: (">=") | ("=>") >
+	| < LE: ("<=") | ("=<") >
+}
+
+////////////////////////////////
+// NUMBERS.
+
+TOKEN :
+{
+	  < NUMBER: (<DIGIT>)+ (<DECIMAL_PART>)? (<EXPONENTIAL_PART>)? >
+	| < #DIGIT: ["0"-"9"] >
+	| < #DECIMAL_PART: "." (<DIGIT>)+ >
+	| < #EXPONENTIAL_PART: ("e"|"E") ("+"|"-")? (<DIGIT>)+ >
+}
+
+////////////////////////////////
+// STRINGS.
+
+TOKEN :
+{
+	< STRING: "\"" (~["\""])* "\"" >
+}
+
+////////////////////////////////
+// RESERVED WORDS.
+
+TOKEN :
+{
+	  < PRINT: "print" >
+	| < IF: "if" >
+	| < THEN: "then" >
+	| < ELSE: "else" >
+	| < GOTO: "goto" >
+	| < WHILE: "while" >
+	| < DO: "do" >
+	| < WEND: "wend" >
+	| < FOR: "for" >
+	| < TO: "to" >
+	| < STEP: "step" >
+	| < NEXT: "next" >
+	| < INPUT: "input" >
+	| < LET: "let" >
+	| < GOSUB: "gosub" >
+	| < RETURN: "return" >
+	| < END: "end" >
+	| < TRUE: "true" >
+	| < FALSE: "false" >
+	| < AND: "and" >
+	| < OR: "or" >
+	| < XOR: "xor" >
+	| < NOT: "not" >
+	| < UNDEF: "undef" >
+}
+
+////////////////////////////////
+// IDENTIFIERS.
+TOKEN :
+{
+	  < IDENTIFIER: (<LETTER> | "_") (<LETTER> | <DIGIT> | "_")* >
+	| < #LETTER: ["A"-"Z","a"-"z"] >
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Grammar
+////////////////////////////////////////////////////////////////////////////////
+
+private void statements(SortedMap<Integer,Statement> code) throws CompilerException :
+{}
+{
+	line(code) statementsRecurs(code)										{ }
+}
+
+private void statementsRecurs(SortedMap<Integer,Statement> code) throws CompilerException :
+{}
+{
+	<CR> line(code) statementsRecurs(code)									{ }
+	|																		{ }
+}
+
+private void line(Map<Integer,Statement> code) throws CompilerException :
+{
+	Token t;
+	AbstractStatementTreeNode s;
+}
+{
+	t=<NUMBER> s=statement()											{ Integer currentLineNumber = NumberUtil.parseInt(t.image);
+																		  if (currentLineNumber==null) {
+																		    throw new CompilerException(
+																		    		CompilationErrorType.INVALID_LINE_NUMBER,
+																					t.beginLine,
+																					t.image);
+																		  }
+																		  if (s!=null) {
+																		    s.setBasicLine(currentLineNumber);
+																			code.put(	currentLineNumber,
+	 																					s);
+	 																	  }
+																		  this.basicLineNumber = currentLineNumber.intValue() + 1;
+																		}
+	| s=statement()														{ if (s!=null) {
+																			s.setBasicLine(this.basicLineNumber);
+																			code.put(	this.basicLineNumber,
+	 																					s);
+	 																	  }
+																		  ++this.basicLineNumber;
+																		}
+}
+
+private AbstractStatementTreeNode statement() throws CompilerException :
+{
+	Token t, t2, t3, t4;
+	AbstractValueTreeNode value, e, l, r;
+	AbstractStatementTreeNode s, s2;
+	AbstractComparisonOperatorTreeNode o;
+	List<VariableName> ids;
+}
+{
+	  t=<PRINT> value=expression()								    	{ return new PrintTreeNode(t.beginLine, value); }
+	| t=<IF> l=expression() o=relop() r=expression()
+	  t2=<THEN> s=statement() s2=elseStatement()						{ if (o==null) {
+																		    throw new CompilerException(
+																		    		CompilationErrorType.EXPECTING_COMPARISON_OPERATOR,
+																					t.endLine,
+																					t.image);
+	  																	  }
+	  																	  if (l==null) {
+																		    throw new CompilerException(
+																		    		CompilationErrorType.EXPECTING_LEFT_OPERAND,
+																					t.endLine,
+																					o.getOperatorString());
+	  																	  }
+	  																	  if (r==null) {
+																		    throw new CompilerException(
+																		    		CompilationErrorType.EXPECTING_RIGHT_OPERAND,
+																					t2.endLine,
+																					o.getOperatorString());
+	  																	  }
+	  																	  o.setOperands(l,r);
+	  																	  if (s==null) {
+	  																	  	ErrorRepository.add(new CompilerWarning(
+		  																	  	CompilationErrorType.NO_STATEMENT_IN_THEN_BLOCK,
+																						t2.endLine,
+																						t2.image));
+	  																	    return null;
+	  																	  }
+	  																	  return new IfThenTreeNode(t.beginLine, o, s, s2); }
+	| t=<WHILE> l=expression() o=relop() r=expression()
+	  t2=<DO> s=statement() <WEND>										{ if (o==null) {
+																		    throw new CompilerException(
+																		    		CompilationErrorType.EXPECTING_COMPARISON_OPERATOR,
+																					t.endLine,
+																					t.image);
+	  																	  }
+	  																	  if (l==null) {
+																		    throw new CompilerException(
+																		    		CompilationErrorType.EXPECTING_LEFT_OPERAND,
+																					t.endLine,
+																					o.getOperatorString());
+	  																	  }
+	  																	  if (r==null) {
+																		    throw new CompilerException(
+																		    		CompilationErrorType.EXPECTING_RIGHT_OPERAND,
+																					t2.endLine,
+																					o.getOperatorString());
+	  																	  }
+	  																	  o.setOperands(l,r);
+	  																	  if (s==null) {
+	  																	  	ErrorRepository.add(new CompilerWarning(
+		  																	  	CompilationErrorType.NO_STATEMENT_IN_WHILE_BLOCK,
+																						t2.endLine,
+																						t2.image));
+	  																	  }
+	  																	  return new WhileTreeNode(t.beginLine, o, s); }
+	| <FOR> t=<IDENTIFIER> t3="=" l=expression() t4=<TO>
+	  r=expression() e=forStep()
+	  s=statement() <NEXT> t2=<IDENTIFIER>								{ if (s==null) {
+	  																	  	ErrorRepository.add(new CompilerWarning(
+		  																	  	CompilationErrorType.NO_STATEMENT_IN_FOR_BLOCK,
+																						t.endLine,
+																						t.image));
+	  																	  }
+	  																	  if (!t.image.equals(t2.image)) {
+	  																	  	throw new CompilerException(
+	  																	  		CompilationErrorType.NOT_SAME_FOR_NEXT_IDENTIFIERS,
+	  																	  				t.endLine,
+	  																	  				t.image+"!="+t2.image);
+	  																	  }
+	  																	  if (l==null) {
+	  																	  	throw new CompilerException(
+		  																	  	CompilationErrorType.EXPECTING_EXPRESSION,
+																						t3.endLine,
+																						t3.image);
+	  																	  }
+	  																	  if (r==null) {
+	  																	  	throw new CompilerException(
+		  																	  	CompilationErrorType.EXPECTING_EXPRESSION,
+																						t4.endLine,
+																						t4.image);
+	  																	  }
+	  																	  return new ForTreeNode(t.beginLine, t.image, l, r, e, s); }
+	| t=<GOTO> e=expression()											{ if (e==null) {
+	  																	  	ErrorRepository.add(new CompilerWarning(
+		  																	  	CompilationErrorType.EXPECTING_EXPRESSION,
+																						t.endLine,
+																						t.image));
+																		    return null;
+	  																	  }
+	  																      return new GotoTreeNode(t.beginLine, e);
+	  																    }
+	| t=<INPUT> ids=var_list()											{ return new InputTreeNode(t.beginLine, ids); }
+	| <LET> t=<IDENTIFIER> r=arrayIndex()
+	  t2="=" e=expression()												{ this.symbolTable.declare(t.image,t.beginLine); 
+																		  if (e==null) {
+	  																	  	ErrorRepository.add(new CompilerWarning(
+		  																	  	CompilationErrorType.EXPECTING_EXPRESSION,
+																						t2.endLine,
+																						t2.image));
+	  																	  }
+	  																      return new AssignmentTreeNode(t.beginLine, new VariableName(t.image,r), e);
+																		}
+	| t=<GOSUB> e=expression()											{ if (e==null) {
+	  																	  	ErrorRepository.add(new CompilerWarning(
+		  																	  	CompilationErrorType.EXPECTING_EXPRESSION,
+																						t.endLine,
+																						t.image));
+																				return null;
+	  																	  }
+	  																      return new GosubTreeNode(t.beginLine, e);
+	  																    }
+	| t=<RETURN>														{ return new ReturnTreeNode(t.beginLine); }
+	| t=<END>															{ return new EndTreeNode(t.beginLine); }
+	|																	{ return null; }					
+}
+
+private AbstractStatementTreeNode elseStatement() throws CompilerException :
+{
+	AbstractStatementTreeNode s;
+}
+{
+	  <ELSE> s=statement()												{ return s; }
+	|																	{ return null; }
+}
+
+private AbstractValueTreeNode forStep() throws CompilerException :
+{
+	Token t;
+	AbstractValueTreeNode e;
+}
+{
+	  t=<STEP> e=expression()											{ if (e==null) {
+	  																	  	ErrorRepository.add(new CompilerWarning(
+		  																	  	CompilationErrorType.EXPECTING_EXPRESSION,
+																						t.endLine,
+																						t.image));
+																		    return null;
+	  																	  }
+	  																	  return e; }
+	|																	{ return null; }
+}
+
+private AbstractComparisonOperatorTreeNode relop() throws CompilerException :
+{
+	Token t;
+}
+{
+	  t=<DIFF>															{ return new NotEqualTreeNode(t.beginLine); }
+	| t=<LE>															{ return new LowerEqualTreeNode(t.beginLine); }
+	| t=<GE>															{ return new GreaterEqualTreeNode(t.beginLine); }
+	| t="="																{ return new EqualTreeNode(t.beginLine); }
+	| t="<"																{ return new LowerThanTreeNode(t.beginLine); }
+	| t=">"																{ return new GreaterThanTreeNode(t.beginLine); }
+}
+
+private List<VariableName> var_list() throws CompilerException :
+{
+	Token t;
+	AbstractValueTreeNode e;
+	List<VariableName> theList = new ArrayList<VariableName>();
+}
+{
+	t=<IDENTIFIER> e=arrayIndex()    									{ this.symbolTable.declare(t.image,t.beginLine);
+																		  theList.add(new VariableName(t.image, e));
+																		}
+	var_list_opt(theList)												{ return theList; }
+}
+
+private void var_list_opt(List<VariableName> theList) throws CompilerException :
+{
+	AbstractValueTreeNode e;
+	Token t;
+}
+{
+		"," t=<IDENTIFIER> e=arrayIndex()								{ this.symbolTable.declare(t.image,t.beginLine);
+																		  theList.add(new VariableName(t.image, e));
+																		}
+		var_list_opt(theList)
+	|																	{ }
+}
+
+////////////////////////////////
+// Numerical Expressions.
+private AbstractValueTreeNode expression() throws CompilerException :
+{
+	AbstractValueTreeNode leftOperand, result;
+}
+{
+	  leftOperand=term1() result=expressionRecurs(leftOperand)			{ return result; }
+}
+
+private AbstractValueTreeNode expressionRecurs(AbstractValueTreeNode leftOperand) throws CompilerException :
+{
+	Token t;
+	AbstractValueTreeNode rightOperand, left, result;
+}
+{
+	 t="+" rightOperand=term1()											{ if (leftOperand==null) {
+																		    throw new CompilerException(
+																		    		CompilationErrorType.EXPECTING_LEFT_OPERAND,
+																					t.endLine,
+																					"+");
+	  																	  }
+	  																	  if (rightOperand==null) {
+																		    throw new CompilerException(
+																		    		CompilationErrorType.EXPECTING_RIGHT_OPERAND,
+																					t.endLine,
+																					"+");
+	  																	  }
+	  																	  left = new AdditionTreeNode(t.beginLine, leftOperand, rightOperand);
+	  																	}
+	  result=expressionRecurs(left)										{ return result; }
+	| t="-" rightOperand=term1()										{ if (leftOperand==null) {
+																		    throw new CompilerException(
+																		    		CompilationErrorType.EXPECTING_LEFT_OPERAND,
+																					t.endLine,
+																					"-");
+	  																	  }
+	  																	  if (rightOperand==null) {
+																		    throw new CompilerException(
+																		    		CompilationErrorType.EXPECTING_RIGHT_OPERAND,
+																					t.endLine,
+																					"-");
+	  																	  }
+	  																	  left = new SubstractionTreeNode(t.beginLine, leftOperand, rightOperand);
+	  																	}
+	  result=expressionRecurs(left)										{ return result; }
+	| 																	{ return leftOperand; }	  
+}
+
+private AbstractValueTreeNode term1() throws CompilerException :
+{
+	AbstractValueTreeNode leftOperand, result;
+}
+{
+	  leftOperand=term2() result=term1Recurs(leftOperand)				{ return result; }
+}
+
+private AbstractValueTreeNode term1Recurs(AbstractValueTreeNode leftOperand) throws CompilerException :
+{
+	Token t;
+	AbstractValueTreeNode rightOperand, left, result;
+}
+{
+	  t="*" rightOperand=term2()										{ if (leftOperand==null) {
+																		    throw new CompilerException(
+																		    		CompilationErrorType.EXPECTING_LEFT_OPERAND,
+																					t.endLine,
+																					"*");
+	  																	  }
+	  																	  if (rightOperand==null) {
+																		    throw new CompilerException(
+																		    		CompilationErrorType.EXPECTING_RIGHT_OPERAND,
+																					t.endLine,
+																					"*");
+	  																	  }
+	  																	  left = new MultiplicationTreeNode(t.beginLine, leftOperand, rightOperand);
+	  																	}
+	  result=term1Recurs(left)											{ return result; }
+	| t="/" rightOperand=term2() 										{ if (leftOperand==null) {
+																		    throw new CompilerException(
+																		    		CompilationErrorType.EXPECTING_LEFT_OPERAND,
+																					t.endLine,
+																					"/");
+	  																	  }
+	  																	  if (rightOperand==null) {
+																		    throw new CompilerException(
+																		    		CompilationErrorType.EXPECTING_RIGHT_OPERAND,
+																					t.endLine,
+																					"/");
+	  																	  }
+	  																	  left = new DivisionTreeNode(t.beginLine, leftOperand, rightOperand);
+	  																	}
+	  result=term1Recurs(left)	  										{ return result; }
+	| 																	{ return leftOperand; }	  
+}
+
+private AbstractValueTreeNode term2() throws CompilerException :
+{
+	AbstractValueTreeNode leftOperand, result;
+}
+{
+	  leftOperand=factor() result=term2Recurs(leftOperand)				{ return result; }
+	  |																	{ return null; }	  
+}
+
+private AbstractValueTreeNode term2Recurs(AbstractValueTreeNode leftOperand) throws CompilerException :
+{
+	Token t;
+	AbstractValueTreeNode rightOperand, left, result;
+}
+{
+	  t=<AND> rightOperand=factor()										{ if (leftOperand==null) {
+																		    throw new CompilerException(
+																		    		CompilationErrorType.EXPECTING_LEFT_OPERAND,
+																					t.endLine,
+																					t.image);
+	  																	  }
+	  																	  if (rightOperand==null) {
+																		    throw new CompilerException(
+																		    		CompilationErrorType.EXPECTING_RIGHT_OPERAND,
+																					t.endLine,
+																					t.image);
+	  																	  }
+	  																	  left = new BooleanAndTreeNode(t.beginLine, leftOperand, rightOperand);
+	  																	}
+	  result=term2Recurs(left)											{ return result; }
+	| t=<OR> rightOperand=factor()										{ if (leftOperand==null) {
+																		    throw new CompilerException(
+																		    		CompilationErrorType.EXPECTING_LEFT_OPERAND,
+																					t.endLine,
+																					t.image);
+	  																	  }
+	  																	  if (rightOperand==null) {
+																		    throw new CompilerException(
+																		    		CompilationErrorType.EXPECTING_RIGHT_OPERAND,
+																					t.endLine,
+																					t.image);
+	  																	  }
+	  																	  left = new BooleanOrTreeNode(t.beginLine, leftOperand, rightOperand);
+	  																	}
+	  result=term2Recurs(left)											{ return result; }
+	| t=<XOR> rightOperand=factor()										{ if (leftOperand==null) {
+																		    throw new CompilerException(
+																		    		CompilationErrorType.EXPECTING_LEFT_OPERAND,
+																					t.endLine,
+																					t.image);
+	  																	  }
+	  																	  if (rightOperand==null) {
+																		    throw new CompilerException(
+																		    		CompilationErrorType.EXPECTING_RIGHT_OPERAND,
+																					t.endLine,
+																					t.image);
+	  																	  }
+	  																	  left = new BooleanXorTreeNode(t.beginLine, leftOperand, rightOperand);
+	  																	}
+	  result=term2Recurs(left)											{ return result; }
+	| 																	{ return leftOperand; }	  
+}
+
+private AbstractValueTreeNode factor() throws CompilerException :
+{
+	AbstractValueTreeNode value;
+	Token t;
+}
+{
+	  t="(" value=expression() ")"										{ if (value==null) {
+																		    ErrorRepository.add(new CompilerWarning(
+		  																	  	CompilationErrorType.EXPECTING_EXPRESSION,
+																						t.endLine,
+																						t.image));
+	  																	  }
+	  																	  return value;
+	  																	}
+	| t=<NOT> value=expression()										{ if (value==null) {
+																		    throw new CompilerException(
+																		    		CompilationErrorType.EXPECTING_RIGHT_OPERAND,
+																					t.endLine,
+																					t.image);
+	  																	  }
+	  																	  return new BooleanNotTreeNode(t.beginLine, value);
+	  																	}
+	| t=<NUMBER>														{ return new NumberTreeNode(t.image, t.beginLine); }	  
+	| t=<STRING>														{ return new StringTreeNode(t.image, t.beginLine); }
+	| t=<TRUE>															{ return new BooleanTreeNode(t.beginLine, true); }	  
+	| t=<FALSE>															{ return new BooleanTreeNode(t.beginLine, false); }	  
+	| t=<UNDEF>															{ return new UndefTreeNode(t.beginLine); }	  
+	| t=<IDENTIFIER> value=arrayIndex()									{ this.symbolTable.declare(t.image,t.beginLine);
+																		  if (value==null) {
+																		  	return new VariableTreeNode(t.beginLine, t.image);
+																		  }
+																		  return new ArrayElementTreeNode(t.beginLine, t.image, value);
+																		}	  
+}
+
+private AbstractValueTreeNode arrayIndex() throws CompilerException :
+{
+	Token t;
+	AbstractValueTreeNode e;
+}
+{
+	  "(" e=expression() ")"											{ return e; }
+	| 																	{ return null; } 
+}

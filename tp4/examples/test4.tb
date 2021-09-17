@@ -1,0 +1,13 @@
+REM FACTORIEL
+
+10 INPUT n
+   LET f = 1
+   LET i = 2
+   WHILE i =< n DO GOSUB 1000 WEND
+   PRINT n+"! = "+f
+   END
+
+1000 LET f = f * i
+     LET i = i + 1
+     RETURN
+ 

@@ -1,0 +1,15 @@
+REM FACTORIEL
+
+10 INPUT n
+   LET f = 1
+   LET i = 2
+   IF n > 1 THEN GOSUB 1000
+   PRINT n+"! = "+f
+   END
+
+1000 IF i > n THEN RETURN
+     LET f = f * i
+     LET i = i + 1
+     GOSUB 1000
+     RETURN
+ 
