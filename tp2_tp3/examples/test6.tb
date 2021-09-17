@@ -1,0 +1,10 @@
+REM FIBONACCI
+
+10 INPUT n
+   LET f(1) = 1
+   LET f(2) = 1
+   FOR i = 3 TO n+1 LET f(i) = f(i-1) + f(i-2) NEXT i
+   PRINT n+"! = "+f
+   END
+
+ 
