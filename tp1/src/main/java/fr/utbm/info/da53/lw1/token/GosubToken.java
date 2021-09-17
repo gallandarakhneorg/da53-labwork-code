@@ -1,7 +1,7 @@
 /* 
  * $Id$
  * 
- * Copyright (c) 2012-2021 Stephane GALLAND, Jonathan DEMANGE.
+ * Copyright (c) 2012-2021 Stephane GALLAND.
  * 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

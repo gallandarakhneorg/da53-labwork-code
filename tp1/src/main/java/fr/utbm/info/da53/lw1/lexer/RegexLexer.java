@@ -1,7 +1,7 @@
 /* 
  * $Id$
  * 
- * Copyright (c) 2012-2021 Stephane GALLAND, Jonathan DEMANGE.
+ * Copyright (c) 2012-2021 Stephane GALLAND.
  * 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -55,7 +55,7 @@ import fr.utbm.info.da53.lw1.token.Token;
  * @author St&eacute;phane GALLAND &lt;stephane.galland@utbm.fr&gt;
  * @version $Name$ $Revision$ $Date$
  */
-public class RegexLexer {
+public class RegexLexer implements Lexer {
 
 	private final Reader stream;
 

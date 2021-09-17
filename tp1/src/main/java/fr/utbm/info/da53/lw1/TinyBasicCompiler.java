@@ -1,7 +1,7 @@
 /* 
  * $Id$
  * 
- * Copyright (c) 2012-2021 Stephane GALLAND, Jonathan DEMANGE.
+ * Copyright (c) 2012-2021 Stephane GALLAND.
  * 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,10 +23,14 @@ import java.io.FileReader;
 import java.util.prefs.Preferences;
 
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
+import fr.utbm.info.da53.lw1.lexer.CharacterPerCharacterLexer;
+import fr.utbm.info.da53.lw1.lexer.Lexer;
 import fr.utbm.info.da53.lw1.lexer.RegexLexer;
 import fr.utbm.info.da53.lw1.symbol.SymbolTable;
 import fr.utbm.info.da53.lw1.token.Token;
+import fr.utbm.info.da53.lw1.util.LocaleUtil;
 
 /** This is the TinyBasic compiler.
  * 
@@ -64,8 +68,18 @@ public class TinyBasicCompiler {
 			// Parse the file
 			SymbolTable symbolTable = new SymbolTable();
 			
-			//CharacterPerCharacterLexer lexer = new CharacterPerCharacterLexer(new FileReader(inputFile), symbolTable);
-			RegexLexer lexer = new RegexLexer(new FileReader(inputFile), symbolTable);
+			int lexerType = JOptionPane.showConfirmDialog(
+					null,
+					LocaleUtil.getString(TinyBasicCompiler.class, "LEXER_TYPE"),
+					LocaleUtil.getString(TinyBasicCompiler.class, "LEXER_TYPE_TITLE"),
+				    JOptionPane.YES_NO_OPTION);
+			
+			Lexer lexer;
+			if (lexerType == JOptionPane.YES_OPTION) {
+				lexer = new RegexLexer(new FileReader(inputFile), symbolTable);
+			} else { 
+				lexer = new CharacterPerCharacterLexer(new FileReader(inputFile), symbolTable);
+			}
 			
 			Token token = lexer.getNextSymbol();
 			int previousLine = 1;
