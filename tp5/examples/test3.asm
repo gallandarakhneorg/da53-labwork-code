@@ -1,0 +1,90 @@
+               #-- INPUT N
+START:         PRINT @S0[PROGRAM_END+0]
+               N[MEMORY_CONTEXT+0] = READ
+               #-- LET F = 1
+L3:            F[MEMORY_CONTEXT+8] = 1
+               #-- LET I = 2
+L4:            I[MEMORY_CONTEXT+16] = 2
+               #-- IF (N>1) THEN GOSUB 1000
+L5:            @T1[MEMORY_CONTEXT+24] = (N[MEMORY_CONTEXT+0] >> 1)
+               JMP L1[PROGRAM_START+288] IF NOT @T1[MEMORY_CONTEXT+24]
+               #-- GOSUB 1000
+               PARAM 1000
+               @T2[MEMORY_CONTEXT+32] = CALL BASICLINES[PROGRAM_START+832], 1
+               CALL @T2[MEMORY_CONTEXT+32], 0
+               #-- PRINT ((N+"! = ")+F)
+L1:            @T3[MEMORY_CONTEXT+40] = (N[MEMORY_CONTEXT+0] + @S2[PROGRAM_END+5])
+               @T4[MEMORY_CONTEXT+48] = (@T3[MEMORY_CONTEXT+40] + F[MEMORY_CONTEXT+8])
+               PRINT @T4[MEMORY_CONTEXT+48]
+               PRINT @S1[PROGRAM_END+3]
+               #-- END
+L6:            EXIT
+               #-- IF (I>N) THEN RETURN
+L7:            @T5[MEMORY_CONTEXT+56] = (I[MEMORY_CONTEXT+16] >> N[MEMORY_CONTEXT+0])
+               JMP L2[PROGRAM_START+544] IF NOT @T5[MEMORY_CONTEXT+56]
+               #-- RETURN
+               RETURN
+               #-- LET F = (F*I)
+L2:            @T6[MEMORY_CONTEXT+64] = (F[MEMORY_CONTEXT+8] * I[MEMORY_CONTEXT+16])
+               F[MEMORY_CONTEXT+8] = @T6[MEMORY_CONTEXT+64]
+               #-- LET I = (I+1)
+L8:            @T7[MEMORY_CONTEXT+72] = (I[MEMORY_CONTEXT+16] + 1)
+               I[MEMORY_CONTEXT+16] = @T7[MEMORY_CONTEXT+72]
+               #-- GOSUB 1000
+L9:            PARAM 1000
+               @T8[MEMORY_CONTEXT+80] = CALL BASICLINES[PROGRAM_START+832], 1
+               CALL @T8[MEMORY_CONTEXT+80], 0
+               #-- RETURN
+L10:           RETURN
+               EXIT
+BASICLINES:    @T9[MEMORY_CONTEXT+88] = PARAM 0
+               @T11[MEMORY_CONTEXT+96] = (@T9[MEMORY_CONTEXT+88] == 10)
+               JMP 992 IF NOT @T11[MEMORY_CONTEXT+96]
+               @T10[MEMORY_CONTEXT+104] = 0[PROGRAM_START+0]
+               RETURN @T10[MEMORY_CONTEXT+104]
+               @T11[MEMORY_CONTEXT+96] = (@T9[MEMORY_CONTEXT+88] == 11)
+               JMP 1120 IF NOT @T11[MEMORY_CONTEXT+96]
+               @T10[MEMORY_CONTEXT+104] = 64[PROGRAM_START+64]
+               RETURN @T10[MEMORY_CONTEXT+104]
+               @T11[MEMORY_CONTEXT+96] = (@T9[MEMORY_CONTEXT+88] == 12)
+               JMP 1248 IF NOT @T11[MEMORY_CONTEXT+96]
+               @T10[MEMORY_CONTEXT+104] = 96[PROGRAM_START+96]
+               RETURN @T10[MEMORY_CONTEXT+104]
+               @T11[MEMORY_CONTEXT+96] = (@T9[MEMORY_CONTEXT+88] == 13)
+               JMP 1376 IF NOT @T11[MEMORY_CONTEXT+96]
+               @T10[MEMORY_CONTEXT+104] = 128[PROGRAM_START+128]
+               RETURN @T10[MEMORY_CONTEXT+104]
+               @T11[MEMORY_CONTEXT+96] = (@T9[MEMORY_CONTEXT+88] == 14)
+               JMP 1504 IF NOT @T11[MEMORY_CONTEXT+96]
+               @T10[MEMORY_CONTEXT+104] = 288[PROGRAM_START+288]
+               RETURN @T10[MEMORY_CONTEXT+104]
+               @T11[MEMORY_CONTEXT+96] = (@T9[MEMORY_CONTEXT+88] == 15)
+               JMP 1632 IF NOT @T11[MEMORY_CONTEXT+96]
+               @T10[MEMORY_CONTEXT+104] = 416[PROGRAM_START+416]
+               RETURN @T10[MEMORY_CONTEXT+104]
+               @T11[MEMORY_CONTEXT+96] = (@T9[MEMORY_CONTEXT+88] == 1000)
+               JMP 1760 IF NOT @T11[MEMORY_CONTEXT+96]
+               @T10[MEMORY_CONTEXT+104] = 448[PROGRAM_START+448]
+               RETURN @T10[MEMORY_CONTEXT+104]
+               @T11[MEMORY_CONTEXT+96] = (@T9[MEMORY_CONTEXT+88] == 1001)
+               JMP 1888 IF NOT @T11[MEMORY_CONTEXT+96]
+               @T10[MEMORY_CONTEXT+104] = 544[PROGRAM_START+544]
+               RETURN @T10[MEMORY_CONTEXT+104]
+               @T11[MEMORY_CONTEXT+96] = (@T9[MEMORY_CONTEXT+88] == 1002)
+               JMP 2016 IF NOT @T11[MEMORY_CONTEXT+96]
+               @T10[MEMORY_CONTEXT+104] = 608[PROGRAM_START+608]
+               RETURN @T10[MEMORY_CONTEXT+104]
+               @T11[MEMORY_CONTEXT+96] = (@T9[MEMORY_CONTEXT+88] == 1003)
+               JMP 2144 IF NOT @T11[MEMORY_CONTEXT+96]
+               @T10[MEMORY_CONTEXT+104] = 672[PROGRAM_START+672]
+               RETURN @T10[MEMORY_CONTEXT+104]
+               @T11[MEMORY_CONTEXT+96] = (@T9[MEMORY_CONTEXT+88] == 1004)
+               JMP 2272 IF NOT @T11[MEMORY_CONTEXT+96]
+               @T10[MEMORY_CONTEXT+104] = 768[PROGRAM_START+768]
+               RETURN @T10[MEMORY_CONTEXT+104]
+               PRINT @S3[PROGRAM_END+10]
+               PRINT @T11[MEMORY_CONTEXT+96]
+               PRINT @S1[PROGRAM_END+3]
+               EXIT 1234
+               RETURN @T10[MEMORY_CONTEXT+104]
+
