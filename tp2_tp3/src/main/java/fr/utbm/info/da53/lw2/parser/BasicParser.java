@@ -101,14 +101,28 @@ Integer currentLineNumber = NumberUtil.parseInt(t.image);
                                                                                                                                                   this.basicLineNumber = currentLineNumber.intValue() + 1;
       break;
       }
-    default:
-      jj_la1[1] = jj_gen;
+    case PRINT:
+    case IF:
+    case GOTO:
+    case WHILE:
+    case FOR:
+    case INPUT:
+    case LET:
+    case GOSUB:
+    case RETURN:
+    case END:{
       s = statement();
 if (s!=null) {
                                                                                                                                                         code.put(       this.basicLineNumber,
                                                                                                                                                                                 s);
                                                                                                                                                   }
                                                                                                                                                   ++this.basicLineNumber;
+      break;
+      }
+    default:
+      jj_la1[1] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
     }
 }
 
@@ -295,7 +309,8 @@ if (e==null) {
       }
     default:
       jj_la1[2] = jj_gen;
-{if ("" != null) return null;}
+      jj_consume_token(-1);
+      throw new ParseException();
     }
     throw new Error("Missing return statement in function");
 }
@@ -719,7 +734,7 @@ this.symbolTable.declare(t.image,t.beginLine);
 	   jj_la1_init_1();
 	}
 	private static void jj_la1_init_0() {
-	   jj_la1_0 = new int[] {0x20,0x200,0x7c4cc000,0x20000,0x1000000,0x1c0,0x0,0x0,0x0,0x80002200,0x0,0x80002200,0x0,};
+	   jj_la1_0 = new int[] {0x20,0x7c4cc200,0x7c4cc000,0x20000,0x1000000,0x1c0,0x0,0x0,0x0,0x80002200,0x0,0x80002200,0x0,};
 	}
 	private static void jj_la1_init_1() {
 	   jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x700,0x800,0x3000,0xc000,0x10071,0xe,0x10071,0x10000,};

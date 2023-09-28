@@ -132,7 +132,7 @@ public class CharacterPerCharacterLexer implements Lexer {
 	 * @return the next token, or <code>null</code> if no more token.
 	 * @throws SyntaxError
 	 */
-	public Token getNextSymbol() throws SyntaxError {
+	public Token getNextToken() throws SyntaxError {
 		Token token;
 		
 		try

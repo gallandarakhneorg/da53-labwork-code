@@ -56,6 +56,6 @@ public interface Lexer {
 	 * @return the next token, or <code>null</code> if no more token.
 	 * @throws SyntaxError
 	 */
-	Token getNextSymbol() throws SyntaxError;
+	Token getNextToken() throws SyntaxError;
 	
 }

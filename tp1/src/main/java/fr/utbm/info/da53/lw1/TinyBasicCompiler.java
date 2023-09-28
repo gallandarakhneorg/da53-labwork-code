@@ -81,7 +81,7 @@ public class TinyBasicCompiler {
 				lexer = new CharacterPerCharacterLexer(new FileReader(inputFile), symbolTable);
 			}
 			
-			Token token = lexer.getNextSymbol();
+			Token token = lexer.getNextToken();
 			int previousLine = 1;
 			boolean isFirstColumn = true;
 			
@@ -94,7 +94,7 @@ public class TinyBasicCompiler {
 				if (!isFirstColumn) System.out.print(" "); //$NON-NLS-1$
 				System.out.print(token.toString());
 				isFirstColumn = false;
-				token = lexer.getNextSymbol();
+				token = lexer.getNextToken();
 			}
 			
 			lexer.dispose();

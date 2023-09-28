@@ -62,12 +62,12 @@ public class NumberToken extends Token {
 		super(lexeme);
 		Number n;
 		try {
-			n = Long.valueOf(lexeme);
-			this.type = NumberType.INTEGER_NUMBER;
-		}
-		catch(Throwable ex) {
 			n = Double.valueOf(lexeme);
 			this.type = NumberType.FLOATING_POINT_NUMBER;
+		}
+		catch(Throwable ex) {
+			n = Long.valueOf(lexeme);
+			this.type = NumberType.INTEGER_NUMBER;
 		}
 		this.value = n;
 	}

@@ -99,7 +99,7 @@ SKIP :
 	   " "
 	|  "\t"
 	|  "\r"
-	|  <"REM" ((" "|"\t")(~["\n","\r"])*)? ("\n" | "\r" | "\r\n")>
+	|  <"REM" ((" "|"\t")(~["\n","\r"])*)? ("\n" | "\r" | "\r\n" | "\n\r")>
 }
 
 TOKEN :
@@ -353,7 +353,6 @@ private AbstractStatementTreeNode statement() throws CompilerException :
 	  																    }
 	| <RETURN>															{ return new ReturnTreeNode(); }
 	| <END>																{ return new EndTreeNode(); }
-	|																	{ return null; }					
 }
 
 private AbstractStatementTreeNode elseStatement() throws CompilerException :

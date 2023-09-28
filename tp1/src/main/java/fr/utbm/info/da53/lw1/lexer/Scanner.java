@@ -29,7 +29,6 @@ import java.io.Reader;
  * The Scanner does not remove the comments because it is too much complex
  * to recognize the "REM" string. It may be the beginning of an identifier.
  * 
- * @author Jonathan DEMANGE &lt;jonathan.demange@utbm.fr&gt;
  * @author St&eacute;phane GALLAND &lt;stephane.galland@utbm.fr&gt;
  * @version $Name$ $Revision$ $Date$
  */

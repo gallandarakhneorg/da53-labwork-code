@@ -170,7 +170,7 @@ public class RegexLexer implements Lexer {
 	 * @return the next token, or {@code null} if no more token.
 	 * @throws SyntaxError
 	 */
-	public Token getNextSymbol() throws SyntaxError {
+	public Token getNextToken() throws SyntaxError {
 		if (this.textContent == null) {
 			StringBuilder content = new StringBuilder();
 			try (BufferedReader breader = new BufferedReader(this.stream)) {

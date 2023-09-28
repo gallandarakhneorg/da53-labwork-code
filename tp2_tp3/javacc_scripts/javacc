@@ -1,5 +1,6 @@
 #!/bin/sh
-JAR="`dirname $0`/../target/javacc.jar"
+#JAR="`dirname $0`/../target/javacc.jar"
+JAR="/home/sgalland/.m2/repository/net/java/dev/javacc/javacc/7.0.10/javacc-7.0.10.jar"
 
 case "`uname`" in
      CYGWIN*) JAR="`cygpath --windows -- "$JAR"`" ;;
